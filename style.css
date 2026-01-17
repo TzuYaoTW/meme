@@ -85,9 +85,9 @@ main {
 
 .image-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: 24px;
-    margin-bottom: 40px;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 16px;
+    margin-bottom: 30px;
 }
 
 @media (max-width: 600px) {
@@ -97,7 +97,7 @@ main {
 }
 
 .grid-item {
-    aspect-ratio: 16/9;
+    aspect-ratio: 1 / 1;
     background-size: cover;
     background-position: center;
     border-radius: 12px;
@@ -212,17 +212,24 @@ input[type="color"] {
     cursor: pointer;
 }
 
-input[type="text"] {
+.tool-group input[type="text"],
+.tool-group textarea {
     width: 100%;
     padding: 12px;
-    border: 1px solid #d2d2d7;
+    border: 1px solid var(--border-color);
     border-radius: 8px;
-    font-size: 1rem;
-    outline: none;
+    font-size: 0.95rem;
+    background: white;
+    box-sizing: border-box;
+    transition: all 0.2s ease;
+    resize: vertical;
 }
 
-input[type="text"]:focus {
+.tool-group input[type="text"]:focus,
+.tool-group textarea:focus {
+    outline: none;
     border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.1);
 }
 
 .primary-btn {
@@ -280,4 +287,19 @@ input[type="text"]:focus {
     box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
     cursor: move;
     touch-action: none;
+}
+
+footer {
+    margin-top: 40px;
+    padding-top: 20px;
+    border-top: 1px solid rgba(0, 0, 0, 0.1);
+    text-align: center;
+}
+
+.disclaimer {
+    font-size: 0.8rem;
+    color: #86868b;
+    line-height: 1.6;
+    max-width: 800px;
+    margin: 0 auto;
 }

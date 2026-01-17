@@ -252,55 +252,64 @@ function draw() {
     const text = textInput.value;
 
     ctx.font = `${weight} ${size}px -apple-system, sans-serif`;
-    ctx.fillStyle = color;
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
 
-    // 加上一點陰影增加可讀性
-    ctx.shadowColor = 'rgba(0,0,0,0.3)';
+    const lines = text.split('\n');
+    const lineHeight = size * 1.2;
+    const totalHeight = lines.length * lineHeight;
+
+    // 加上陰影與描邊
+    ctx.shadowColor = 'rgba(0,0,0,0.5)';
     ctx.shadowBlur = 10;
-    ctx.shadowOffsetX = 2;
-    ctx.shadowOffsetY = 2;
+    ctx.lineWidth = size / 10; // 邊框粗細隨字體大小調整
+    ctx.strokeStyle = '#000000'; // 預設黑色邊框
+    ctx.lineJoin = 'round';
+    ctx.fillStyle = color;
 
-    ctx.fillText(text, textPos.x, textPos.y);
+    let maxWidth = 0;
+    lines.forEach((line, index) => {
+        const y = textPos.y - (totalHeight / 2) + (index * lineHeight) + (lineHeight / 2);
 
-    // 計算文字範圍 (Bounding Box) 用於拖曳判定
-    const metrics = ctx.measureText(text);
-    const textWidth = metrics.width;
-    const textHeight = size;
+        // 先畫描邊再填色
+        ctx.strokeText(line, textPos.x, y);
+        ctx.fillText(line, textPos.x, y);
 
+        const metrics = ctx.measureText(line);
+        if (metrics.width > maxWidth) maxWidth = metrics.width;
+    });
+
+    // 計算文字範圍 (Bounding Box)
     canvas.textRect = {
-        x1: textPos.x - textWidth / 2,
-        y1: textPos.y - textHeight / 2,
-        x2: textPos.x + textWidth / 2,
-        y2: textPos.y + textHeight / 2
+        x1: textPos.x - maxWidth / 2,
+        y1: textPos.y - totalHeight / 2,
+        x2: textPos.x + maxWidth / 2,
+        y2: textPos.y + totalHeight / 2
     };
 
-    // 繪製選取框與縮放手把 (僅在編輯時顯示)
-    if (text) {
+    // 繪製選取框與縮放手把
+    if (text.trim()) {
         ctx.save();
         ctx.shadowBlur = 0;
         ctx.shadowOffsetX = 0;
         ctx.shadowOffsetY = 0;
 
-        // 選取框
         ctx.strokeStyle = 'rgba(0, 122, 255, 0.6)';
         ctx.setLineDash([5, 5]);
         ctx.lineWidth = 2;
         ctx.strokeRect(
-            canvas.textRect.x1 - 5,
-            canvas.textRect.y1 - 5,
-            (canvas.textRect.x2 - canvas.textRect.x1) + 10,
-            (canvas.textRect.y2 - canvas.textRect.y1) + 10
+            canvas.textRect.x1 - 10,
+            canvas.textRect.y1 - 10,
+            (canvas.textRect.x2 - canvas.textRect.x1) + 20,
+            (canvas.textRect.y2 - canvas.textRect.y1) + 20
         );
 
-        // 縮放手把 (右下角)
-        const handleSize = Math.max(15, size / 5); // 根據字體大小調整手把大小，但不小於 15
-        const hx = canvas.textRect.x2 + 5;
-        const hy = canvas.textRect.y2 + 5;
+        const handleSize = Math.max(15, size / 5);
+        const hx = canvas.textRect.x2 + 10;
+        const hy = canvas.textRect.y2 + 10;
 
         ctx.fillStyle = '#007aff';
-        ctx.setLineDash([]); // 實線
+        ctx.setLineDash([]);
         ctx.fillRect(hx - handleSize / 2, hy - handleSize / 2, handleSize, handleSize);
         ctx.strokeStyle = 'white';
         ctx.lineWidth = 2;
@@ -388,10 +397,26 @@ function endDrag() {
 }
 
 function downloadImage() {
+    const text = textInput.value.trim();
+
+    // 只取第一行作為檔名參考，並限制字數在 15 字以內
+    let firstLine = text.split('\n')[0].substring(0, 15);
+
+    // 嚴格過濾：只保留中文、英文、數字、底線、橫線
+    let safeName = firstLine.replace(/[^\u4e00-\u9fa5a-zA-Z0-9_-]/g, '');
+
+    // 如果過濾後為空，使用預設值
+    const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
+    const finalFileName = safeName ? `${safeName}_${timestamp}` : `meme_${timestamp}`;
+
     const link = document.createElement('a');
-    link.download = 'my-creation.png';
+    link.download = `${finalFileName}.png`;
     link.href = canvas.toDataURL('image/png');
+
+    // 某些瀏覽器需要將連結加入 body 才能點擊
+    document.body.appendChild(link);
     link.click();
+    document.body.removeChild(link);
 }
 
 init();

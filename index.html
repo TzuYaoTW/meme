@@ -1,15 +1,17 @@
 <!DOCTYPE html>
 <html lang="zh-Hant">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>圖片文字編輯器 - Simple & Elegant</title>
+    <title>Meme Haven - Simple & Elegant</title>
     <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
     <div class="container">
         <header>
-            <h1>圖片文字編輯器</h1>
+            <h1>Meme Haven</h1>
             <p id="subTitle">簡單、直覺的圖文創作工具</p>
         </header>
 
@@ -17,7 +19,7 @@
             <!-- 第一頁：相簿選擇 -->
             <section id="pageGallery" class="page-section">
                 <div class="gallery-info">
-                    <h2>選擇底圖</h2>
+                    <h2>選擇圖片</h2>
                     <p>請先從下方相簿選擇一張您喜歡的圖片作為底圖</p>
                 </div>
                 <div class="image-grid" id="imageGrid">
@@ -52,7 +54,7 @@
 
                         <div class="tool-group">
                             <label>2. 輸入文字</label>
-                            <input type="text" id="textInput" placeholder="在此輸入文字..." value="你好，世界">
+                            <textarea id="textInput" placeholder="在此輸入文字..." rows="3">你好，世界</textarea>
                         </div>
 
                         <div class="action-group">
@@ -67,7 +69,14 @@
                 </div>
             </section>
         </main>
+
+        <footer>
+            <div class="disclaimer">
+                <p>免責聲明：本工具僅供娛樂與創作使用。使用者需對其所創作及分享之內容負完全法律責任。本站不承擔因內容使用所產生之任何責任。</p>
+            </div>
+        </footer>
     </div>
     <script src="script.js"></script>
 </body>
+
 </html>
