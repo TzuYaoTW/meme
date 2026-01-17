@@ -238,7 +238,7 @@ function goToGallery() {
     subTitle.innerText = '簡單、直覺的圖文創作工具';
 }
 
-function draw() {
+function draw(exportMode = false) {
     if (!currentImg.complete) return;
 
     // 清空並畫底圖
@@ -287,8 +287,8 @@ function draw() {
         y2: textPos.y + totalHeight / 2
     };
 
-    // 繪製選取框與縮放手把
-    if (text.trim()) {
+    // 繪製選取框與縮放手把 (僅在非導出模式且有文字時繪製)
+    if (!exportMode && text.trim()) {
         ctx.save();
         ctx.shadowBlur = 0;
         ctx.shadowOffsetX = 0;
@@ -397,6 +397,9 @@ function endDrag() {
 }
 
 function downloadImage() {
+    // 1. 強制進入輸出模式 (隱藏輔助線)
+    draw(true);
+
     const text = textInput.value.trim();
 
     // 只取第一行作為檔名參考，並限制字數在 15 字以內
@@ -417,6 +420,9 @@ function downloadImage() {
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
+
+    // 2. 下載結束後切換回編輯模式 (顯示輔助線)
+    draw(false);
 }
 
 init();
