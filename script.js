@@ -48,33 +48,52 @@ async function init() {
     // 滑鼠/觸控拖曳文字
     const getPos = (e) => {
         const rect = canvas.getBoundingClientRect();
+        let clientX, clientY;
+
         if (e.touches && e.touches[0]) {
-            return {
-                x: e.touches[0].clientX - rect.left,
-                y: e.touches[0].clientY - rect.top
-            };
+            clientX = e.touches[0].clientX;
+            clientY = e.touches[0].clientY;
+        } else {
+            clientX = e.clientX;
+            clientY = e.clientY;
         }
+
         return {
-            x: e.offsetX,
-            y: e.offsetY
+            x: clientX - rect.left,
+            y: clientY - rect.top
         };
     };
 
-    canvas.onmousedown = (e) => startDrag(e.offsetX, e.offsetY);
-    canvas.onmousemove = (e) => drag(e.offsetX, e.offsetY);
-    canvas.onmouseup = endDrag;
-    canvas.onmouseleave = endDrag;
-
-    canvas.ontouchstart = (e) => {
+    // 滑鼠事件
+    canvas.addEventListener('mousedown', (e) => {
         const pos = getPos(e);
         startDrag(pos.x, pos.y);
-    };
-    canvas.ontouchmove = (e) => {
+    });
+    canvas.addEventListener('mousemove', (e) => {
         const pos = getPos(e);
         drag(pos.x, pos.y);
-    };
-    canvas.ontouchend = endDrag;
-    canvas.ontouchcancel = endDrag;
+    });
+    canvas.addEventListener('mouseup', endDrag);
+    canvas.addEventListener('mouseleave', endDrag);
+
+    // 觸控事件 (重要：需設定 passive: false 才能 preventDefault)
+    canvas.addEventListener('touchstart', (e) => {
+        const pos = getPos(e);
+        if (startDrag(pos.x, pos.y)) {
+            e.preventDefault();
+        }
+    }, { passive: false });
+
+    canvas.addEventListener('touchmove', (e) => {
+        if (isDragging) {
+            const pos = getPos(e);
+            drag(pos.x, pos.y);
+            e.preventDefault(); // 防止滾動
+        }
+    }, { passive: false });
+
+    canvas.addEventListener('touchend', endDrag);
+    canvas.addEventListener('touchcancel', endDrag);
 
     downloadBtn.onclick = downloadImage;
 }
@@ -191,7 +210,9 @@ function startDrag(x, y) {
             x: canvasX - textPos.x,
             y: canvasY - textPos.y
         };
+        return true;
     }
+    return false;
 }
 
 function drag(x, y) {
