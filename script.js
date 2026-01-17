@@ -46,10 +46,35 @@ async function init() {
     fontColorInput.oninput = draw;
 
     // 滑鼠/觸控拖曳文字
+    const getPos = (e) => {
+        const rect = canvas.getBoundingClientRect();
+        if (e.touches && e.touches[0]) {
+            return {
+                x: e.touches[0].clientX - rect.left,
+                y: e.touches[0].clientY - rect.top
+            };
+        }
+        return {
+            x: e.offsetX,
+            y: e.offsetY
+        };
+    };
+
     canvas.onmousedown = (e) => startDrag(e.offsetX, e.offsetY);
     canvas.onmousemove = (e) => drag(e.offsetX, e.offsetY);
     canvas.onmouseup = endDrag;
     canvas.onmouseleave = endDrag;
+
+    canvas.ontouchstart = (e) => {
+        const pos = getPos(e);
+        startDrag(pos.x, pos.y);
+    };
+    canvas.ontouchmove = (e) => {
+        const pos = getPos(e);
+        drag(pos.x, pos.y);
+    };
+    canvas.ontouchend = endDrag;
+    canvas.ontouchcancel = endDrag;
 
     downloadBtn.onclick = downloadImage;
 }
